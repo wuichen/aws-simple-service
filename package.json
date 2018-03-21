@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "description": "aws serverless simple functions for dynamodb / api-gateway / lambda",
   "homepage": "",
-  "repository": "",
+  "repository": "https://github.com/wuichen/aws-simple-service",
   "author": "wuichen",
   "license": "",
   "keywords": [],

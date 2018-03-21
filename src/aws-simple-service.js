@@ -120,7 +120,7 @@ export default class simpleService {
             let newList = [...existingItems, ...newItems]
             const updateObject = {...ids}
             updateObject[params.field] = newList
-            return this.updateAsync(updateObject, {ReturnValues: 'ALL_NEW'})            
+            return this.updateAsync(updateObject, {ReturnValues: 'ALL_NEW'})
           } else {
             returnPromiseResult({message: 'field is not a list(array) type'}, true)
           }
@@ -136,4 +136,44 @@ export default class simpleService {
       returnPromiseResult({message: '0 new items found in the request body'}, true)
     }
   }
+
+  async simpleFieldListDelete(params, ids = this.ids, data = this.data) {
+  	if (data.items && data.items.length > 0) {
+      let toRemove = data.items
+      try {
+        const result = await this.getAsync(ids)
+        let parentObject = result.get()
+        if (parentObject) {
+          // check if the list exists on the object. if not, exit
+          if (!parentObject[params.field]) {
+          	returnPromiseResult({message: 'list doesnt exist'}, true)
+          } else if (parentObject[params.field].length < data.items.length) {
+          	returnPromiseResult({message: 'more update items than existing items'}, true)
+          } else {
+          	let existingItems = parentObject[params.field]
+	          if (Array.isArray(existingItems)) {
+
+	          	let newList = existingItems.filter((item) => {
+							  return toRemove.indexOf(item) < 0;
+							});
+	            const updateObject = {...ids}
+	            updateObject[params.field] = newList
+	            return this.updateAsync(updateObject, {ReturnValues: 'ALL_NEW'})
+	          } else {
+	            returnPromiseResult({message: 'field is not a list(array) type'}, true)
+	          }
+          }
+
+        } else {
+          returnPromiseResult({message: 'item was not found'}, true)
+        }
+      } catch (e) {
+        // this catch is for the getAsync call
+        returnPromiseResult(e, true)
+      }
+    } else {
+      returnPromiseResult({message: '0 items found in the request body'}, true)
+    }
+  }
+
 }
